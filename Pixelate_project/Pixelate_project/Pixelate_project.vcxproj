@@ -148,6 +148,7 @@
   <ItemGroup>
     <ClInclude Include="..\BeliefState\BeliefState.h" />
     <ClInclude Include="..\Comm\Comm.h" />
+    <ClInclude Include="..\Kalman\Kalman.h" />
     <ClInclude Include="..\Planner\planner.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -155,6 +156,7 @@
   <ItemGroup>
     <ClCompile Include="..\BeliefState\BeliefState.cpp" />
     <ClCompile Include="..\Comm\Comm.cpp" />
+    <ClCompile Include="..\Kalman\Kalman.cpp" />
     <ClCompile Include="..\Planner\planner.cpp" />
     <ClCompile Include="Pixelate_project.cpp" />
     <ClCompile Include="stdafx.cpp">

@@ -27,6 +27,15 @@
 #define thresh_sat_bot 102
 #define thresh_sat_box 102
 #define thresh_sat_ball 102
+#define hue_arrow
+#define sat_arrow
+#define lum_arrow
+#define thresh_hue_arrow
+#define thresh_sat_arrow
+#define thresh_lum_arrow
+
+
+
 
 using namespace std;
 using namespace BS;
@@ -34,6 +43,7 @@ using namespace cv;
 namespace BS
 {
 	Point contour_finding(Mat,int,int,int,int,int,int,const string c);
+	void erosion(Mat);
 
 	BeliefState::BeliefState()
 	{
@@ -47,18 +57,16 @@ namespace BS
 	}
 	void BeliefState::update(Mat frame)
 	{
-		Mat frame1=frame;
-		Mat frame2=frame;
-		Mat frame3=frame;
-		Mat frame4=frame;
+		Mat frame1=frame.clone();
+		Mat frame2=frame.clone();
+		Mat frame3=frame.clone();
+		Mat frame4=frame.clone();
 
-
-		cout<<"updating"<<endl;
-		//calc_botPos( frame1,"BOT");
-		//calc_ballPos(frame2,"BALL");
+		calc_botPos( frame1,"BOT");
+		calc_ballPos(frame2,"BALL");
 		calc_boxPos(frame3,"BOX");
-		calc_arrowPos(frame4,"Arr");
-		cout<<"updated"<<endl;
+		//calc_arrowPos(frame4,"Arr"); 
+		
 	}
 	void BeliefState::calc_vel(Mat frame)
 	{
@@ -147,13 +155,18 @@ namespace BS
 	
 }
 
- Point/* BeliefState::*/contour_finding(Mat src,int h,int s,int l,int t_h,int t_s,int t_l,const string c)
+ Point contour_finding(Mat src,int h,int s,int l,int t_h,int t_s,int t_l,const string c)
 {
 	 Mat gray;
     //cvtColor(src, gray, CV_BGR2GRAY);
 	 gray=color_detection(src,h,s,l,t_h,t_s,t_l);
+	 erosion(gray);
     //threshold(gray, gray,200, 255,THRESH_BINARY_INV); //Threshold the gray
     //imshow("gray",gray);
+
+	 //eroding
+	 //erosion(gray);
+
 	int largest_area=0;
     int largest_contour_index=0;
     Rect bounding_rect;
@@ -213,6 +226,14 @@ namespace BS
 	return center;
 }
 
-
+ void erosion(Mat img)
+ {
+	 static int n=2;
+	 namedWindow("eroding",WINDOW_AUTOSIZE);
+	 createTrackbar("erode_size","eroding",&n,7);
+	 Mat element=getStructuringElement(MORPH_RECT,Size(2*n+1,2*n+1),Point(n,n));
+	 erode(img,img,element);
+	 imshow("eroding",img);	
+ }
 
 }

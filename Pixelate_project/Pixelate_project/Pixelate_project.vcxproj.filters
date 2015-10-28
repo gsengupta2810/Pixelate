@@ -33,6 +33,9 @@
     <ClInclude Include="..\Comm\Comm.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Kalman\Kalman.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -48,6 +51,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Planner\planner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Kalman\Kalman.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
