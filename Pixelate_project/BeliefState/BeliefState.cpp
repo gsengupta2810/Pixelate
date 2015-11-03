@@ -7,6 +7,7 @@
 #include <opencv2/objdetect/objdetect.hpp>
 
 #include<iostream>
+#include<string.h>
 #include<C:\Pixelate_project\BeliefState\BeliefState.h>
 
 #define hue_bot 71
@@ -33,9 +34,14 @@
 #define thresh_hue_arrow
 #define thresh_sat_arrow
 #define thresh_lum_arrow
+#define hue_boxD 42
+#define sat_boxD 149
+#define lum_boxD 113
+#define thresh_boxD_hue 45
+#define thresh_boxD_sat 26
+#define thresh_boxD_lum 15
 
-
-
+#define erode_n 2
 
 using namespace std;
 using namespace BS;
@@ -44,6 +50,7 @@ namespace BS
 {
 	Point contour_finding(Mat,int,int,int,int,int,int,const string c);
 	void erosion(Mat);
+	void dilation(Mat);
 
 	BeliefState::BeliefState()
 	{
@@ -65,6 +72,7 @@ namespace BS
 		calc_botPos( frame1,"BOT");
 		calc_ballPos(frame2,"BALL");
 		calc_boxPos(frame3,"BOX");
+		calc_boxDestPos(frame4,"BOX_DEST");
 		//calc_arrowPos(frame4,"Arr"); 
 		
 	}
@@ -113,7 +121,18 @@ namespace BS
 		boxPosX=center.x;
 		boxPosY=center.y;
 	}
-
+	void BeliefState::calc_boxDestPos(Mat frame,const string c)
+	{
+		/*
+		  1.color detection
+		  2.contour finding
+		  3.center determination
+		  4.update the box position variables
+		*/
+		Point center=contour_finding(frame,hue_boxD,sat_boxD,lum_boxD,thresh_boxD_hue,thresh_boxD_sat,thresh_boxD_lum,c);
+		boxDestPosX=center.x;
+		boxDestPosY=center.y;
+	}
 	void BeliefState::calc_arrowPos(Mat frame,const string c)
 	{
 		/*
@@ -155,12 +174,14 @@ namespace BS
 	
 }
 
- Point contour_finding(Mat src,int h,int s,int l,int t_h,int t_s,int t_l,const string c)
+ Point BeliefState::contour_finding(Mat src,int h,int s,int l,int t_h,int t_s,int t_l,const string c)
 {
 	 Mat gray;
+	
     //cvtColor(src, gray, CV_BGR2GRAY);
 	 gray=color_detection(src,h,s,l,t_h,t_s,t_l);
 	 erosion(gray);
+	 dilation(gray);
     //threshold(gray, gray,200, 255,THRESH_BINARY_INV); //Threshold the gray
     //imshow("gray",gray);
 
@@ -187,14 +208,51 @@ namespace BS
             bounding_rect=boundingRect(contours[i]);
         }
     }
+	//************************finding corners of the bounding_rect******************
+	string check="BOX";
+	if(!check.compare(c))
+	{
+		cout<<"i am here :D  "<<c<<" "<<bounding_rect.width<<" "<<bounding_rect.height<<endl;
+		boxCorners[0].x=bounding_rect.x;
+		boxCorners[0].y=bounding_rect.y;
+		boxCorners[1].x=bounding_rect.x+bounding_rect.width;
+		boxCorners[1].y=bounding_rect.y;
+		boxCorners[2].x=bounding_rect.x;
+		boxCorners[2].y=bounding_rect.y+bounding_rect.height;
+		boxCorners[3].x=bounding_rect.x+bounding_rect.width;
+		boxCorners[3].y=bounding_rect.y+bounding_rect.height;
+
+	}
+	/*for(int i=0;i<4;i++)
+	{
+		cout<<boxCorners[i].x<<","<<boxCorners[i].y<<endl;
+	}*/
+
+	string check1="BOX_DEST";
+	if(!check1.compare(c))
+	{
+		cout<<"i am here :D  "<<c<<" "<<bounding_rect.width<<" "<<bounding_rect.height<<endl;
+		boxDestCorners[0].x=bounding_rect.x;
+		boxDestCorners[0].y=bounding_rect.y;
+		boxDestCorners[1].x=bounding_rect.x+bounding_rect.width;
+		boxDestCorners[1].y=bounding_rect.y;
+		boxDestCorners[2].x=bounding_rect.x;
+		boxDestCorners[2].y=bounding_rect.y+bounding_rect.height;
+		boxDestCorners[3].x=bounding_rect.x+bounding_rect.width;
+		boxDestCorners[3].y=bounding_rect.y+bounding_rect.height;
+
+	}
 	
 	//************************* finding center of contour *******************************
+	
 	vector<Moments> mu(contours.size() );
 	for( int i = 0; i < contours.size(); i++ ){
 		mu[i] = moments( contours[i], false );
 	}
+	
+	
 
-	//Mass center
+	// Mass center
 	vector<Point2f> mc( contours.size() );
 	  for( int i = 0; i < contours.size(); i++ ){ 
 		mc[i] = Point2f( mu[i].m10/mu[i].m00 , mu[i].m01/mu[i].m00 ); 
@@ -228,12 +286,20 @@ namespace BS
 
  void erosion(Mat img)
  {
-	 static int n=2;
-	 namedWindow("eroding",WINDOW_AUTOSIZE);
-	 createTrackbar("erode_size","eroding",&n,7);
+	 static int n=erode_n;
+	 //namedWindow("eroding",WINDOW_AUTOSIZE);
+	 //createTrackbar("erode_size","eroding",&n,7);
 	 Mat element=getStructuringElement(MORPH_RECT,Size(2*n+1,2*n+1),Point(n,n));
 	 erode(img,img,element);
-	 imshow("eroding",img);	
+	 //imshow("eroding",img);	
  }
-
+ void dilation(Mat img)
+ { 
+	 static int n=2;
+	 //namedWindow("dilating",WINDOW_AUTOSIZE);
+	 //createTrackbar("dilate_size","dilating",&n,7);
+	 Mat element=getStructuringElement(MORPH_RECT,Size(2*n+1,2*n+1),Point(n,n));
+	 dilate(img,img,element);
+	 //imshow("eroding",img);	
+ }
 }

@@ -11,7 +11,7 @@
 #include "opencv2/video/tracking.hpp"
 #include<Windows.h>
 
-#include<C:\Pixelate_project\Kalman\Kalman.h>
+//#include<C:\Pixelate_project\Kalman\Kalman.h>
 //#include<C:\Pixelate_project\BeliefState\BeliefState.h>
 #include<C:\Pixelate_project\Comm\Comm.h>
 #include<C:\Pixelate_project\Planner\planner.h>
@@ -29,7 +29,7 @@ using namespace cv;
 using namespace std;
 using namespace Kalman;
 using namespace BS;
-
+using namespace Plan;
 
 int main()
 {
@@ -37,20 +37,25 @@ int main()
 	BeliefState state;
 	
 	//***********************initialize kalman*************************
-	Mat frame_init;
-	cap>>frame_init;
-	state.update(frame_init);
-	Point init_pos;
-	init_pos.x=state.botPosX;
-	init_pos.y=state.botPosY;
-	KalmanFilter kf=kalman(frame_init,init_pos); 
-	Mat_<float> measurement(2,1);measurement.setTo(Scalar(0));
-			
-	//image to show tracking
-	Mat img(600,800,CV_8SC3);
-	vector<Point> posv,kalmanv;
-	posv.clear();
-	kalmanv.clear();
+	
+	//Mat frame_init;
+	//cap>>frame_init;
+	//
+	//state.update(frame_init);
+	///*Planner plan(state,frame_init);
+	//cout<<"destinations "<<plan.at_start<<" "<<plan.des1.x<<" "<<plan.des1.y<<" "<<plan.des3.x<<" "<<plan.des3.y<<endl;
+	//*/
+	//Point init_pos;
+	//init_pos.x=state.botPosX;
+	//init_pos.y=state.botPosY;
+	//KalmanFilter kf=kalman(frame_init,init_pos); 
+	//Mat_<float> measurement(2,1);measurement.setTo(Scalar(0));
+	//		
+	////image to show tracking
+	//Mat img(600,800,CV_8SC3);
+	//vector<Point> posv,kalmanv;
+	//posv.clear();
+	//kalmanv.clear();
 
 	//*****************************************************
 	
@@ -58,8 +63,10 @@ int main()
 	frame=imread("field.png",CV_LOAD_IMAGE_COLOR);
 	imshow("src",frame);
 	state.update(frame);
-	
-	cout<<"botPos : ("<<state.botPosX<<","<<state.botPosY<<") ballPos: ("<<state.ballPosX<<","<<state.ballPosY<<") boxPos: ("<<state.boxPosX<<","<<state.boxPosY<<")"<<endl;
+	Planner plan(state,frame); 
+	cout<<"grid position of bot "<<plan.bot_pos.x<<","<<plan.bot_pos.y<<endl;
+	cout<<"destinations "<<plan.at_start<<" 1: "<<plan.des1.x<<","<<plan.des1.y<<" 2: "<<plan.des2.x<<","<<plan.des2.y<<" 3: "<<plan.des3.x<<","<<plan.des3.y<<endl;
+	cout<<"botPos : ("<<state.botPosX<<","<<state.botPosY<<") ballPos: ("<<state.ballPosX<<","<<state.ballPosY<<") boxPos: ("<<state.boxPosX<<","<<state.boxPosY<<") boxDestPos: ("<<state.boxDestPosX<<","<<state.boxDestPosY<<")"<<endl;
 	
 
 	//**************************************************

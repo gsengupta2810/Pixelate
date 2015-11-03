@@ -24,6 +24,15 @@ namespace BS
 		short int ballPosY;
 		short int boxPosX;
 		short int boxPosY;
+		short int boxDestPosX;
+		short int boxDestPosY;
+		Point boxCorners[4];
+		Point boxDestCorners[4];
+		
+
+		/*short int boxDestX;
+		short int boxDestY;*/
+
 		vector<short int> arrowPosX;
 		vector<short int> arrowPosY;
 		vector<short int> arrowDirection;
@@ -38,7 +47,7 @@ namespace BS
 		
 		BeliefState();
 		void update(Mat);
-		//Point contour_finding(Mat,int,int,int,int,int,int,const string c);
+		Point contour_finding(Mat,int,int,int,int,int,int,const string c);
 
 		//calculation functions 
 
@@ -47,7 +56,7 @@ namespace BS
 		void calc_ballPos(Mat,const string);
 		void calc_boxPos(Mat,const string);
 		void calc_arrowPos(Mat,const string);
-
+		void calc_boxDestPos(Mat,const string);
 
 	};
 
