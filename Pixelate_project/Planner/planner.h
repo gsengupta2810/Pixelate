@@ -18,7 +18,7 @@ namespace Plan
 	class Planner
 	{
 		public:
-			int grid[14][22]; //grid for path planning
+			int grid[28][44]; //grid for path planning
 			Point des1;
 			Point des2;
 			Point des3;
@@ -28,11 +28,15 @@ namespace Plan
 
 			bool des1_reached;
 			bool des2_reached;
-			bool des3_reached;
+		    bool des3_reached;
 			bool at_start;
 			//functions 
-
+			Planner()
+			{
+			}
 			Planner(BeliefState,Mat);
+			void update(BeliefState,Mat);
+			void show_grid(); 
 			Mat wall_detect(Mat);
 			Mat box(Mat);
 			Mat box_dest(Mat);

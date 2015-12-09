@@ -30,10 +30,10 @@
     <ClInclude Include="..\BeliefState\BeliefState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Comm\Comm.h">
+    <ClInclude Include="..\Kalman\Kalman.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\Kalman\Kalman.h">
+    <ClInclude Include="..\Djikstras\Djikstras.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -47,13 +47,16 @@
     <ClCompile Include="..\BeliefState\BeliefState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\Comm\Comm.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\Planner\planner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Kalman\Kalman.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Djikstras\Djikstras.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\tserial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

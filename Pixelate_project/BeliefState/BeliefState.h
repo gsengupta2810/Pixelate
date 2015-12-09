@@ -20,12 +20,17 @@ namespace BS
 		// position variables
 		short int botPosX;
 		short int botPosY;
+		short int botPosX1;
+		short int botPosY1;
+		short int botPosX2;
+		short int botPosY2;
 		short int ballPosX;
 		short int ballPosY;
 		short int boxPosX;
 		short int boxPosY;
 		short int boxDestPosX;
 		short int boxDestPosY;
+		float botAngle;
 		Point boxCorners[4];
 		Point boxDestCorners[4];
 		
@@ -52,6 +57,7 @@ namespace BS
 		//calculation functions 
 
 		void calc_vel(Mat);
+		void calc_angle();
 		void calc_botPos(Mat,const string);
 		void calc_ballPos(Mat,const string);
 		void calc_boxPos(Mat,const string);

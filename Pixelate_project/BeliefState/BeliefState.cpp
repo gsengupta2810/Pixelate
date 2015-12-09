@@ -11,21 +11,27 @@
 #include<C:\Pixelate_project\BeliefState\BeliefState.h>
 
 #define hue_bot 71
+#define hue_bot1 160
 #define hue_box 26
 #define hue_ball 141
 #define sat_bot 89
+#define sat_bot1 110
 #define sat_box 89
 #define sat_ball 89
 #define lum_bot 197
+#define lum_bot1 22
 #define lum_box 197
 #define lum_ball 91
 #define thresh_hue_bot 34 
+#define thresh_hue_bot1 25
 #define thresh_hue_box 34
 #define thresh_hue_ball 34
 #define thresh_lum_bot 62
+#define thresh_lum_bot1 61
 #define thresh_lum_box 62
 #define thresh_lum_ball 62
 #define thresh_sat_bot 102
+#define thresh_sat_bot1 87
 #define thresh_sat_box 102
 #define thresh_sat_ball 102
 #define hue_arrow
@@ -42,7 +48,7 @@
 #define thresh_boxD_lum 15
 
 #define erode_n 2
-
+#define dilate_n 2
 using namespace std;
 using namespace BS;
 using namespace cv;
@@ -68,13 +74,33 @@ namespace BS
 		Mat frame2=frame.clone();
 		Mat frame3=frame.clone();
 		Mat frame4=frame.clone();
+		//Mat frame5=frame.clone();
 
 		calc_botPos( frame1,"BOT");
 		calc_ballPos(frame2,"BALL");
 		calc_boxPos(frame3,"BOX");
 		calc_boxDestPos(frame4,"BOX_DEST");
+		calc_angle();
 		//calc_arrowPos(frame4,"Arr"); 
 		
+	}
+	void BeliefState::calc_angle()
+	{
+		float angle;
+		Point c1=Point(botPosX1,botPosY1);
+		Point c2=Point(botPosX2,botPosY2);
+		if(c1.x-c2.x==0) 
+			{
+				if(c1.y>c2.y)
+				angle=90;
+				else angle=-90;
+			}
+		else 
+			{
+				angle=atan((c1.y-c2.y)/(c1.x-c2.x));
+				angle=angle*3.142/180;
+			}
+		botAngle=angle;
 	}
 	void BeliefState::calc_vel(Mat frame)
 	{
@@ -90,12 +116,16 @@ namespace BS
 		  3.center determination
 		  4.update the bot position variables
 		*/
-
+		Mat frame1=frame.clone();
 		Point center=contour_finding(frame,hue_bot,sat_bot,lum_bot,thresh_hue_bot,thresh_sat_bot,thresh_lum_bot,c);
-		botPosX=center.x;
-		botPosY=center.y;
-		 
-
+		botPosX1=center.x;
+		botPosY1=center.y;
+		string c1="BOT1";
+		center=contour_finding(frame1,hue_bot1,sat_bot1,lum_bot1,thresh_hue_bot1,thresh_sat_bot1,thresh_lum_bot1,c1);
+		botPosX2=center.x;
+		botPosY2=center.y;	
+		botPosX=(botPosX1+botPosX2)/2;
+		botPosY=(botPosY1+botPosY2)/2;
 	}
 	void BeliefState::calc_ballPos(Mat frame,const string c)
 	{
@@ -212,7 +242,7 @@ namespace BS
 	string check="BOX";
 	if(!check.compare(c))
 	{
-		cout<<"i am here :D  "<<c<<" "<<bounding_rect.width<<" "<<bounding_rect.height<<endl;
+		//cout<<"i am here :D  "<<c<<" "<<bounding_rect.width<<" "<<bounding_rect.height<<endl;
 		boxCorners[0].x=bounding_rect.x;
 		boxCorners[0].y=bounding_rect.y;
 		boxCorners[1].x=bounding_rect.x+bounding_rect.width;
@@ -223,6 +253,7 @@ namespace BS
 		boxCorners[3].y=bounding_rect.y+bounding_rect.height;
 
 	}
+	
 	/*for(int i=0;i<4;i++)
 	{
 		cout<<boxCorners[i].x<<","<<boxCorners[i].y<<endl;
@@ -231,7 +262,7 @@ namespace BS
 	string check1="BOX_DEST";
 	if(!check1.compare(c))
 	{
-		cout<<"i am here :D  "<<c<<" "<<bounding_rect.width<<" "<<bounding_rect.height<<endl;
+		//cout<<"i am here :D  "<<c<<" "<<bounding_rect.width<<" "<<bounding_rect.height<<endl;
 		boxDestCorners[0].x=bounding_rect.x;
 		boxDestCorners[0].y=bounding_rect.y;
 		boxDestCorners[1].x=bounding_rect.x+bounding_rect.width;
@@ -295,7 +326,7 @@ namespace BS
  }
  void dilation(Mat img)
  { 
-	 static int n=2;
+	 static int n=dilate_n;
 	 //namedWindow("dilating",WINDOW_AUTOSIZE);
 	 //createTrackbar("dilate_size","dilating",&n,7);
 	 Mat element=getStructuringElement(MORPH_RECT,Size(2*n+1,2*n+1),Point(n,n));
