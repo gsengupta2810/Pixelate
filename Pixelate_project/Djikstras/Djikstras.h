@@ -36,16 +36,18 @@ namespace djikstras
 		bool box_picked;
 		bool box_released;
 		bool ball_kicked;
-		
+		bool straight_check;
+
+		//sending variable
+		char data;
 		//functions
 		Djikstras();
-		void motion();
+		void motion(Planner);
 		void initiate();
-		void set(BeliefState);
-		void set_start_dest(Point,Point);
-		void run(BeliefState);
-		void com();
-		void check_straight(BeliefState);
-
+		void set(BeliefState,Planner);
+		//void set_start_dest(Point,Point,Planner);
+		void run(BeliefState,Planner);
+		void com(Planner);
+		void check_straight(BeliefState,Planner);
 	};
 }

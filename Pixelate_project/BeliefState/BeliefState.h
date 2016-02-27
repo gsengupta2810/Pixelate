@@ -6,6 +6,7 @@
 
 #include<iostream>
 #include<vector>
+
 using namespace std;
 using namespace cv;
 
@@ -34,7 +35,10 @@ namespace BS
 		Point boxCorners[4];
 		Point boxDestCorners[4];
 		
-
+		//for lpf
+		Point past;
+		Point smoothData;
+		
 		/*short int boxDestX;
 		short int boxDestY;*/
 
@@ -63,7 +67,7 @@ namespace BS
 		void calc_boxPos(Mat,const string);
 		void calc_arrowPos(Mat,const string);
 		void calc_boxDestPos(Mat,const string);
-
+		void lpf();
 	};
 
 }

@@ -8,6 +8,7 @@
 
 #include<iostream>
 #include<fstream>
+#include<deque>
 #include<C:\Pixelate_project\Planner\planner.h>
 //#include<C:\Pixelate_project\BeliefState\BeliefState.h>
 //#include<C:\Pixelate_project\Kalman\Kalman.h>
@@ -16,33 +17,33 @@ using namespace std;
 using namespace BS;
 using namespace cv;
 
-#define hue_wall 175
-#define sat_wall 87
-#define lum_wall 197
-#define thresh_hue 33
-#define thresh_sat 103
-#define thresh_lum 62
-#define hue_boxD 42
+#define hue_wall 208
+#define sat_wall 132
+#define lum_wall 149
+#define thresh_hue 49
+#define thresh_sat 54
+#define thresh_lum 54
+#define hue_boxD 37
 #define sat_boxD 149
-#define lum_boxD 113
-#define thresh_boxD_hue 45
-#define thresh_boxD_sat 26
-#define thresh_boxD_lum 15
-#define hue_box 26
-#define sat_box 89
-#define lum_box 197
-#define thresh_hue_box 34
-#define thresh_lum_box 62
-#define thresh_sat_box 102
+#define lum_boxD 212
+#define thresh_boxD_hue 17
+#define thresh_boxD_sat 22
+#define thresh_boxD_lum 28
+#define hue_box 67
+#define sat_box 160
+#define lum_box 154
+#define thresh_hue_box 20
+#define thresh_lum_box 31
+#define thresh_sat_box 72
 
-#define erode_n 2
-#define dilate_n 2
+#define erode_n 1
+#define dilate_n 5
+#define wall_param 25
 
 namespace Plan
 {
-	 
-	 
-
+	 void erosion(Mat);	 
+	 void dilation(Mat);
 	Planner::Planner(BeliefState state,Mat img)
 	{
 		for(int i=0;i<28;i++)
@@ -78,6 +79,89 @@ namespace Plan
 		
 		Mat img1=img.clone();
 		update_grid(img1,state);
+		update_wall_properly();
+	}
+	void Planner::update_wall_properly()
+	{
+		for(int i=0;i<28;i++)
+		{
+			for(int j=0;j<44;j++)
+			{
+				if(grid[i][j]==1)
+				{
+					int countx=0,county=0;
+					for(int k=0;k<5;k++)
+					{
+						if(grid[i+k][j]==1) countx++;
+						if(grid[i-k][j]==1) countx++; 
+						if(grid[i][j+k]==1) county++;
+						if(grid[i][j-k]==1) county++;
+					}
+					if(countx<3 && county<3)
+						grid[i][j]=0;
+				}
+				if(grid[i][j]==0)
+				{
+					int countx=0,county=0;
+					for(int k=0;k<5;k++)
+					{
+						if(grid[i+k][j]==1) countx++;
+						if(grid[i-k][j]==1) countx++;
+						if(grid[i][j+k]==1) county++;
+						if(grid[i][j-k]==1) county++;
+					}
+					if(countx>3 || county>3)
+						grid[i][j]=0;
+				}
+			}
+		}
+		/*int arrx[44]={0},arry[28]={0};
+		for(int i=0;i<28;i++)
+		{
+			if(grid[i][20]==1 ||grid[i][22]==1 || grid[i][18]==1 || grid[i][15]==1 || grid[i][28]==1) arry[i]++;
+		}
+		for(int i=0;i<44;i++)
+		{
+			if(grid[10][i]==1||grid[14][i]==1||grid[18][i]==1||grid[12][i]==1||grid[16][i]==1||grid[20][i]==1) arrx[i]++;
+		}
+		int last_wallx=0,last_wally=0,first_wallx=0,first_wally=0;
+		int i=28;
+		while(i--)
+		{
+			if(arry[i]>0)
+				{
+					last_wally=i;
+					break;
+				}
+		}
+		i=0;
+		while(i++)
+		{
+			if(arry[i]>0)
+				{
+					first_wally=i;
+					break;
+				}
+		}
+		i=0;
+		while(i++)
+		{
+			if(arrx[i]>0)
+				{
+					first_wallx=i;
+					break;
+				}
+		}
+		i=44;
+		while(i--)
+		{
+			if(arrx[i]>0)
+				{
+					last_wallx=i;
+					break;
+				}
+		}
+		cout<<first_wallx<<" "<<last_wallx<<" "<<first_wally<<" "<<last_wally<<endl;*/	
 	}
 
 	Mat Planner::wall_detect(Mat img)
@@ -90,22 +174,22 @@ namespace Plan
 		
 		for(int i=0;i<img.rows;i++)
 		{
-		
+		 
 			for(int j=0;j<img.cols;j++)
 			{
 				if((channels[0].at<uchar>(i,j)<hue_wall+thresh_hue && channels[0].at<uchar>(i,j)>hue_wall-thresh_hue)  && (channels[1].at<uchar>(i,j)<sat_wall+thresh_sat && channels[1].at<uchar>(i,j)>sat_wall-thresh_sat) && (channels[2].at<uchar>(i,j)<lum_wall+thresh_lum && channels[2].at<uchar>(i,j)>lum_wall-thresh_lum) ) img1.at<uchar>(i,j)=255;
 			}
 	
 		}
-		
-
+		erosion(img1);
+		dilation(img1);
 		 return img1;
 	}
 	
 	void Planner:: show_grid()
 	{
 		ofstream file;
-		file.open("grid.txt");
+		file.open("grid.txt",ios::trunc);
 		
 		for(int i=0;i<28;i++)
 		{
@@ -122,47 +206,7 @@ namespace Plan
 		
 
 	}
-	
-	//Mat Planner::box_dest(Mat img)
-	//{
-	//	cvtColor(img,img,CV_BGR2HLS);
-	//	vector<Mat> channels;
-	//	split(img,channels);
-	//
-	//	Mat img1(img.rows,img.cols,CV_8UC1,Scalar(0));
-	//	
-	//	for(int i=0;i<img.rows;i++)
-	//	{
-	//	
-	//		for(int j=0;j<img.cols;j++)
-	//		{
-	//			if((channels[0].at<uchar>(i,j)<hue_boxD+thresh_boxD_hue && channels[0].at<uchar>(i,j)>hue_boxD-thresh_boxD_hue)  && (channels[1].at<uchar>(i,j)<sat_boxD+thresh_boxD_sat && channels[1].at<uchar>(i,j)>sat_box-thresh_boxD_sat) && (channels[2].at<uchar>(i,j)<lum_boxD+thresh_boxD_lum && channels[2].at<uchar>(i,j)>lum_boxD-thresh_boxD_lum) ) img1.at<uchar>(i,j)=255;
-	//		}
-	//
-	//	}
 
-	//	 return img1;
-	//}
-	/*Mat Planner::box(Mat img)
-	{
-		cvtColor(img,img,CV_BGR2HLS);
-		vector<Mat> channels;
-		split(img,channels);
-	
-		Mat img1(img.rows,img.cols,CV_8UC1,Scalar(0));
-		
-		for(int i=0;i<img.rows;i++)
-		{
-		
-			for(int j=0;j<img.cols;j++)
-			{
-				if((channels[0].at<uchar>(i,j)<hue_box+thresh_hue_box && channels[0].at<uchar>(i,j)>hue_box-thresh_hue_box)  && (channels[1].at<uchar>(i,j)<sat_box+thresh_sat_box && channels[1].at<uchar>(i,j)>sat_box-thresh_sat_box) && (channels[2].at<uchar>(i,j)<lum_box+thresh_lum_box && channels[2].at<uchar>(i,j)>lum_box-thresh_lum_box) ) img1.at<uchar>(i,j)=255;
-			}
-	
-		}
-
-		 return img1;
-	}*/
 	void Planner::update_grid(Mat img,BeliefState state)
 	{
 		//wall detection
@@ -186,7 +230,7 @@ namespace Plan
 				{
 					for(int j=0;j<28;j++)
 					{
-						if(grid[j][i]>=50)grid[j][i]=1;
+						if(grid[j][i]>=wall_param)grid[j][i]=1;
 						else grid[j][i]=0;
 					}
 				}				    
@@ -301,4 +345,5 @@ namespace Plan
 		 dilate(img,img,element);
 		 //imshow("eroding",img);	
 	 }
+	
 }

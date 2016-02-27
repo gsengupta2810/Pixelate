@@ -8,50 +8,52 @@
 
 #include<iostream>
 #include<string.h>
+#include<fstream>
 #include<C:\Pixelate_project\BeliefState\BeliefState.h>
 
-#define hue_bot 71
-#define hue_bot1 160
-#define hue_box 26
-#define hue_ball 141
-#define sat_bot 89
-#define sat_bot1 110
-#define sat_box 89
-#define sat_ball 89
-#define lum_bot 197
-#define lum_bot1 22
-#define lum_box 197
-#define lum_ball 91
-#define thresh_hue_bot 34 
-#define thresh_hue_bot1 25
-#define thresh_hue_box 34
-#define thresh_hue_ball 34
-#define thresh_lum_bot 62
-#define thresh_lum_bot1 61
-#define thresh_lum_box 62
-#define thresh_lum_ball 62
-#define thresh_sat_bot 102
-#define thresh_sat_bot1 87
-#define thresh_sat_box 102
-#define thresh_sat_ball 102
+#define hue_bot 106
+#define hue_bot1 9
+#define hue_box 67
+#define hue_ball 0
+#define sat_bot 128
+#define sat_bot1 158
+#define sat_box 160
+#define sat_ball 0
+#define lum_bot 240
+#define lum_bot1 238
+#define lum_box 154
+#define lum_ball 0
+#define thresh_hue_bot 15
+#define thresh_hue_bot1 8
+#define thresh_hue_box 20
+#define thresh_hue_ball 0
+#define thresh_lum_bot 64
+#define thresh_lum_bot1 30
+#define thresh_lum_box 31
+#define thresh_lum_ball 0
+#define thresh_sat_bot 31
+#define thresh_sat_bot1 18
+#define thresh_sat_box 72
+#define thresh_sat_ball 0
 #define hue_arrow
 #define sat_arrow
 #define lum_arrow
 #define thresh_hue_arrow
 #define thresh_sat_arrow
 #define thresh_lum_arrow
-#define hue_boxD 42
+#define hue_boxD 37
 #define sat_boxD 149
-#define lum_boxD 113
-#define thresh_boxD_hue 45
-#define thresh_boxD_sat 26
-#define thresh_boxD_lum 15
+#define lum_boxD 212
+#define thresh_boxD_hue 17
+#define thresh_boxD_sat 28
+#define thresh_boxD_lum 22
 
-#define erode_n 2
+#define erode_n 1
 #define dilate_n 2
 using namespace std;
 using namespace BS;
 using namespace cv;
+
 namespace BS
 {
 	Point contour_finding(Mat,int,int,int,int,int,int,const string c);
@@ -67,6 +69,9 @@ namespace BS
 		boxPosX=0;
 		boxPosY=0;
 		
+		//initialising for lpf
+		past=Point(botPosX,botPosY);  
+		smoothData=Point(botPosX,botPosY);		
 	}
 	void BeliefState::update(Mat frame)
 	{
@@ -81,24 +86,50 @@ namespace BS
 		calc_boxPos(frame3,"BOX");
 		calc_boxDestPos(frame4,"BOX_DEST");
 		calc_angle();
-		//calc_arrowPos(frame4,"Arr"); 
-		
+
+		//ofstream file;
+		//file.open("botPos.txt",ios::app);
+		//file<<botPosX<<" "<<botPosY<<" "; 
+		//
+		////using the low pass filter
+ 	//    lpf();
+		//
+		//file<<botPosX<<" "<<botPosY<<endl;
+		//file.close();
+
 	}
+
+	void BeliefState::lpf()
+	{
+		float beta=0.25;
+		/*
+			**** the working foemula is y[i-1]=beta*x[i]+(1-beta)*y[i-1] , it is ban exponentially weighted moving avg like formula
+			**** x[i] being the current reading and y[i-1] being the last value , beta being a constant factor 
+		*/
+		smoothData.x=past.x+(beta*(botPosX-past.x));
+		smoothData.y=past.y+(beta*(botPosY-past.y));
+		
+		botPosX=smoothData.x;
+		botPosY=smoothData.y;
+		
+		past=Point(botPosX,botPosY);
+	}
+
 	void BeliefState::calc_angle()
 	{
 		float angle;
 		Point c1=Point(botPosX1,botPosY1);
 		Point c2=Point(botPosX2,botPosY2);
-		if(c1.x-c2.x==0) 
+		if(abs(c1.x-c2.x)<5) 
 			{
-				if(c1.y>c2.y)
+				if(c1.y<c2.y)
 				angle=90;
 				else angle=-90;
 			}
 		else 
 			{
-				angle=atan((c1.y-c2.y)/(c1.x-c2.x));
-				angle=angle*3.142/180;
+				angle=atan2((c2.y-c1.y),(c2.x-c1.x));
+				angle=angle*180/3.14;
 			}
 		botAngle=angle;
 	}

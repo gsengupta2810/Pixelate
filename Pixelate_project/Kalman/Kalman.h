@@ -9,11 +9,21 @@
 #include<iostream>
 #include<C:\Pixelate_project\BeliefState\BeliefState.h>
 
-using namespace BS;
 using namespace std;
 using namespace cv;
 
-namespace Kalman
+namespace BS
 {
-	KalmanFilter kalman(Mat,Point);
+	// low pass filter class 
+	class low_pass_filter
+	{
+		public:
+
+		Point past;
+		Point smoothData;
+		
+		//function for lpf
+		void lpf(BeliefState);
+		low_pass_filter(BeliefState);
+	};
 }

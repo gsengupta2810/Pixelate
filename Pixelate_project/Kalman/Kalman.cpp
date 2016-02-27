@@ -7,30 +7,34 @@
 #include <opencv2/objdetect/objdetect.hpp>
 
 #include<iostream>
-#include<C:\Pixelate_project\BeliefState\BeliefState.h>
+#include<C:\Pixelate_project\Kalman\Kalman.h>
 
 using namespace BS;
 using namespace std;
 using namespace cv;
 
-namespace Kalman
+namespace BS
 {
-	KalmanFilter kalman(Mat img,Point pos)
+	low_pass_filter::low_pass_filter(BeliefState state)
 	{
-		KalmanFilter kf(4,2,0);
-		//Point pos;
-		kf.transitionMatrix=*(Mat_<float>(4,4)<<1,0,1,0,   0,1,0,1,   0,0,1,0,  0,0,0,1);
-		Mat_<float> measurement(2,1);measurement.setTo(Scalar(0));
+		past=Point(0,0);//Point(state.botPosX,state.botPosY);
+		smoothData=Point(0,0);//Point(state.botPosX,state.botPosY);
+	}
 
-		kf.statePre.at<float>(0) =pos.x;
-		kf.statePre.at<float>(1)=pos.y;
-		kf.statePre.at<float>(2)=0;
-		kf.statePre.at<float>(3)=0;
+	void low_pass_filter::lpf(BeliefState state)
+	{
+		float beta=0.025;
+		
+		//the working foemula is y[i-1]=beta*x[i]+(1-beta)*y[i-1] , it is ban exponentially weighted moving avg like formula
+		// x[i] being the current reading and y[i-1] being the last value , beta being a constant factor 
 
-		setIdentity(kf.measurementMatrix);
-		setIdentity(kf.processNoiseCov,Scalar::all(1e-4));
-		setIdentity(kf.measurementNoiseCov,Scalar::all(10));
-		setIdentity(kf.errorCovPost,Scalar::all(.1));
-		return kf;
+		smoothData.x=past.x+(beta*(state.botPosX-past.x));
+		smoothData.y=past.y+(beta*(state.botPosY-past.y));
+		
+		state.botPosX=smoothData.x;
+		state.botPosY=smoothData.y;
+		
+		past=Point(state.botPosX,state.botPosY);
+
 	}
 }

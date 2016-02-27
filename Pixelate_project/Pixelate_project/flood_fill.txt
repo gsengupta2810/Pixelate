@@ -1,0 +1,159 @@
+	void Planner::flood_fill(BeliefState state)
+	{
+		bool going_up=false;
+		bool going_down=false;
+		bool going_left=false;
+		bool going_right=false;
+
+		if(state.botAngle>-55 && state.botAngle<55)
+			{
+				going_right=true;
+				cout<<"going right"<<endl;
+			}
+			else if(state.botAngle>50 && state.botAngle<125)
+			{
+				cout<<"going down"<<endl;
+				going_down=true;
+			}
+			else if((state.botAngle<-125 && state.botAngle>-180) || (state.botAngle>125 && state.botAngle<180))
+			{
+				cout<<"going left"<<endl;
+				going_left=true;
+			}
+			else if(state.botAngle<-65 && state.botAngle>-125)
+			{
+				going_up=true;
+				cout<<"going up"<<endl;
+			}
+
+		deque<Point> q; // a queue of points for using flood fill 
+		if(going_up==true)
+		{
+			cout<<"0"<<endl;
+			Point start;
+			start.x=bot_pos.x;
+			start.y=bot_pos.y+2;
+			cout<<start.x<<" "<<start.y<<" "<<grid[start.y][start.x]<<endl;
+			if(grid[start.y][start.x]==0)
+			{
+				q.push_back(start);
+				cout<<"1"<<endl;   
+				while(q.empty()==false)
+				{
+					cout<<"2 "; 
+					for(int i=0;i<2;i++)
+					{
+						for(int k=-1;k<2 ;k++)
+						{
+							if(grid[q[0].y+i][q[0].x+k]==0)
+							{
+								int count=0;
+								for(int l=1;l<5;l++)
+								{
+									if(grid[q[0].y+i+l][q[0].y+k]==1) count++;
+									if(grid[q[0].y+i-l][q[0].y+k]==1) count++;
+									if(grid[q[0].y+i][q[0].y+k-l]==1) count++;
+									if(grid[q[0].y+i][q[0].y+k+l]==1) count++;
+
+								}
+								if( q[0].y+i<28 && q[0].x+k<44 && count<2)
+								{
+									q.push_back(Point(q[0].x+k,q[0].y+i));
+									grid[q[0].y+i][q[0].x+k]=9;
+								}
+							}
+						}
+					}
+					cout<<q[0].x<<" "<<q[0].y<<endl;
+					q.pop_front();
+				}
+			}			
+		}
+		else if(going_down==true)
+		{
+			cout<<"0"<<endl;
+			Point start;
+			start.x=bot_pos.x;
+			start.y=bot_pos.y-2;
+			cout<<start.x<<" "<<start.y<<" "<<grid[start.y][start.x]<<endl;
+			if(grid[start.y][start.x]==0)
+			{
+				q.push_back(start);
+				cout<<"1"<<endl;   
+				while(q.empty()==false)
+				{
+					cout<<"2 "; 
+					for(int i=-1;i<1;i++)
+					{
+						for(int k=-1;k<2 ;k++)
+						{
+							if(grid[q[0].y+i][q[0].x+k]==0)
+							{
+								int count=0;
+								for(int l=1;l<5;l++)
+								{
+									if(grid[q[0].y+i+l][q[0].y+k]==1) count++;
+									if(grid[q[0].y+i-l][q[0].y+k]==1) count++;
+									if(grid[q[0].y+i][q[0].y+k-l]==1) count++;
+									if(grid[q[0].y+i][q[0].y+k+l]==1) count++;
+
+								}
+								if( q[0].y+i<28 && q[0].x+k<44 && count<2)
+								{
+									q.push_back(Point(q[0].x+k,q[0].y+i));
+									grid[q[0].y+i][q[0].x+k]=9;
+								}
+							}
+						}
+					}
+					cout<<q[0].x<<" "<<q[0].y<<endl;
+					q.pop_front();
+				}
+			}
+		}
+		else if(going_left==true)
+		{
+			cout<<"0"<<endl;
+			Point start;
+			start.x=bot_pos.x+2;
+			start.y=bot_pos.y;
+			cout<<start.x<<" "<<start.y<<" "<<grid[start.y][start.x]<<endl;
+			if(grid[start.y][start.x]==0)
+			{
+				q.push_back(start);
+				cout<<"1"<<endl;   
+				while(q.empty()==false)
+				{
+					cout<<"2 "; 
+					for(int i=0;i<2;i++)
+					{
+						for(int k=-1;k<2 ;k++)
+						{
+							if(grid[q[0].y+i][q[0].x+k]==0)
+							{
+								int count=0;
+								for(int l=1;l<5;l++)
+								{
+									if(grid[q[0].y+i+l][q[0].y+k]==1) count++;
+									if(grid[q[0].y+i-l][q[0].y+k]==1) count++;
+									if(grid[q[0].y+i][q[0].y+k-l]==1) count++;
+									if(grid[q[0].y+i][q[0].y+k+l]==1) count++;
+
+								}
+								if( q[0].y+i<28 && q[0].x+k<44 && count<2)
+								{
+									q.push_back(Point(q[0].x+k,q[0].y+i));
+									grid[q[0].y+i][q[0].x+k]=9;
+								}
+							}
+						}
+					}
+					cout<<q[0].x<<" "<<q[0].y<<endl;
+					q.pop_front();
+				}
+			}
+		}
+		else if(going_left==true)
+		{
+		}
+	}

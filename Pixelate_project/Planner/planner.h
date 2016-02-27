@@ -41,5 +41,6 @@ namespace Plan
 			Mat box(Mat);
 			Mat box_dest(Mat);
 			void update_grid(Mat,BeliefState);
+			void update_wall_properly();
 	};
 }
